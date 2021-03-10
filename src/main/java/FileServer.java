@@ -33,24 +33,6 @@ public class FileServer {
             String mensagem = entrada.readUTF();//receber mensagem em minúsculo do cliente
             System.out.println("Recebe do cliente: "+mensagem);
 
-
-            /*mensagem = mensagem.replace("\\", "\\\\");
-
-            System.out.println("Essa é a mensagem: "+mensagem);*/
-
-/*
-            // situação 1: 1 Pasta apenass
-            String string = mensagem;
-            String[] splitted= string.split("'\'");
-
-            String pasta= splitted[0];
-            String arquivo = splitted[1];
-
-            System.out.println("pasta "+pasta);
-            System.out.println("arquivo "+arquivo);
-        String juncao = "server_1/"+arquivo;
-        System.out.println("juncao"+String.valueOf(Paths.get(juncao)));
-*/
             try {
                 in = socket.getInputStream();
             } catch (IOException ex) {
@@ -60,8 +42,8 @@ public class FileServer {
             try {
                 //String juncao = "server_1/"+arquivo;
 
-                //System.out.println("juncao"+String.valueOf(Paths.get(juncao)));
-                out = new FileOutputStream("server_1/ola.txt");
+                System.out.println("*** server_1/"+mensagem);
+                out = new FileOutputStream("server_1/"+mensagem);
             } catch (FileNotFoundException ex) {
                 System.out.println("File not found. ");
             }
@@ -72,11 +54,11 @@ public class FileServer {
             while ((count = in.read(bytes)) > 0) {
                 out.write(bytes, 0, count);
             }
-
+//}
             out.close();
             in.close();
             socket.close();
             serverSocket.close();
-        //}
+
     }
 }

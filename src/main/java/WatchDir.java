@@ -148,16 +148,6 @@ public class WatchDir {
                 if (event.kind().name() == "ENTRY_CREATE"){
                     System.out.println("ENTRY_CREATE");
                     System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
-/*
-                    String string = String.valueOf(name);
-                    String[] splitted= string.split("-");
-
-                    String pasta= splitted[0];
-                    String arquivo = splitted[1];
-
-                    System.out.println("pasta "+pasta);
-                    System.out.println("arquivo "+arquivo);*/
-
 
                     Socket socket = null;
                     String host = "127.0.0.1";
@@ -166,7 +156,7 @@ public class WatchDir {
 
                     //2 - Definir stream de saída de dados do cliente
                     DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
-                    saida.writeUTF(String.valueOf(child)); //Envia  mensagem para o servidor
+                    saida.writeUTF(String.valueOf(name)); //Envia  mensagem para o servidor
 
                     File file = new File(String.valueOf(child));
                     // Get the size of the file
