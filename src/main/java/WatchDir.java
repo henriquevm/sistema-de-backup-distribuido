@@ -152,7 +152,7 @@ public class WatchDir {
                     Socket socket = null;
                     String host = "127.0.0.1";
                     //1 - Abrir conexão
-                    socket = new Socket(host, 4444);
+                    socket = new Socket(host, 54322);
 
                     //2 - Definir stream de saída de dados do cliente
                     DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
