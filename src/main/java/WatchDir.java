@@ -158,6 +158,7 @@ public class WatchDir {
                     DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
                     saida.writeUTF(String.valueOf(name)); //Envia  mensagem para o servidor
 
+                    System.out.println("child "+child);
                     File file = new File(String.valueOf(child));
                     // Get the size of the file
                     long length = file.length();

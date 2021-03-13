@@ -7,65 +7,71 @@ public class FileServer {
     public static void main(String[] args) throws IOException {
 
         ServerSocket servidorSocket = null;
-        Socket socket = null;
-        InputStream in = null;
-        OutputStream out = null;
+
 
         try {
             servidorSocket = new ServerSocket(54322);
             System.out.println("A porta 54322 foi aberta!");
             System.out.println("Servidor esperando receber mensagens de clientes...");
         } catch (IOException ex) {
-            System.out.println("Can't setup server on this port number. ");
+            System.out.println("Não é possível configurar o servidor neste número de porta.");
         }
 
+        Socket socket = null;
+        InputStream in = null;
 
-    while (true) {
-        try {
-            //2 - Aguardar solicitações de conexão de clientes
-            socket = servidorSocket.accept();
-            //Mostrar endereço IP do cliente conectado
-            System.out.println("Cliente " + socket.getInetAddress().getHostAddress() + " conectado");
-        } catch (IOException ex) {
-            System.out.println("Can't accept client connection. ");
-        }
-
-        //3 - Definir uma thread para cada cliente conectado
-        ThreadSockets thread = new ThreadSockets(socket);
-        thread.start();
-    }
-/*
-            //4 - Definir stream de entrada de dados no servidor
-            DataInputStream entrada = new DataInputStream(socket.getInputStream());
-            String mensagem = entrada.readUTF();//receber mensagem em minúsculo do cliente
-            System.out.println("Recebe do cliente: "+mensagem);
+        while (true) {
+            try {
+                //2 - Aguardar solicitações de conexão de clientes
+                socket = servidorSocket.accept();
+                //Mostrar endereço IP do cliente conectado
+                System.out.println("Cliente " + socket.getInetAddress().getHostAddress() + " conectado");
+            } catch (IOException ex) {
+                System.out.println("Não é possível aceitar a conexão do cliente.");
+            }
 
             try {
                 in = socket.getInputStream();
             } catch (IOException ex) {
-                System.out.println("Can't get socket input stream. ");
+                System.out.println("Não é possível obter o fluxo de entrada do soquete");
             }
 
-            try {
-                //String juncao = "server_1/"+arquivo;
+            //3 - Definir uma thread para cada cliente conectado
+            ThreadSockets thread = new ThreadSockets(socket, in);
+            thread.start();
+        }
 
-                System.out.println("*** server_1/"+mensagem);
-                out = new FileOutputStream("server_1/"+mensagem);
-            } catch (FileNotFoundException ex) {
-                System.out.println("File not found. ");
-            }
+        /*//4 - Definir stream de entrada de dados no servidor
+        DataInputStream entrada = new DataInputStream(socket.getInputStream());
+        String mensagem = entrada.readUTF();//receber mensagem em minúsculo do cliente
+        System.out.println("Recebe do cliente: "+mensagem);
 
-            byte[] bytes = new byte[16*1024];
+        try {
+            in = socket.getInputStream();
+        } catch (IOException ex) {
+            System.out.println("Can't get socket input stream. ");
+        }
 
-            int count;
-            while ((count = in.read(bytes)) > 0) {
-                out.write(bytes, 0, count);
-            }
-//}
-            out.close();
-            in.close();
-            socket.close();
-            serverSocket.close();*/
+        try {
+            //String juncao = "server_1/"+arquivo;
+
+            System.out.println("*** server_1/"+mensagem);
+            out = new FileOutputStream("server_1/"+mensagem);
+        } catch (FileNotFoundException ex) {
+            System.out.println("File not found. ");
+        }
+
+        byte[] bytes = new byte[16*1024];
+
+        int count;
+        while ((count = in.read(bytes)) > 0) {
+            out.write(bytes, 0, count);
+        }
+
+        out.close();
+        in.close();
+        socket.close();
+        serverSocket.close();*/
 
     }
 }
