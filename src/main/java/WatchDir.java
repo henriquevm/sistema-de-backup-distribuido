@@ -145,7 +145,7 @@ public class WatchDir {
                 // print out event
                 System.out.format("Evento  %s: %s\n", event.kind().name(), child);
 
-                if (event.kind().name() == "ENTRY_CREATE"){
+                if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY"){
 
                     System.out.println("ENTRY_CREATE");
                    // System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
