@@ -5,20 +5,29 @@ import java.net.Socket;
 
 
 public class ThreadSockets extends Thread {
-    private Socket socket;
-    private InputStream in;
-    public ThreadSockets(Socket s, InputStream in) {
 
+    private Socket socket;
+    private InputStream in = null;
+
+    public ThreadSockets(Socket s, InputStream in) {
         this.socket = s;
         this.in = in;
     }
 
     public void run() {
-        System.out.println(Thread.currentThread().getName());//Imprimir o nome da Thread
-        try {
+        //Imprimir o nome da Thread
+        System.out.println(Thread.currentThread().getName());
 
-            //escrever um dado em algum local
-            OutputStream out = null;
+        //InputStream in = null;
+        OutputStream out = null;
+
+        try {
+/*
+            try {
+                InputStream in = socket.getInputStream();
+            } catch (IOException ex) {
+                System.out.println("Não é possível obter o fluxo de entrada do soquete ");
+            }*/
 
             //3 - Definir stream de entrada de dados no servidor
             String mensagem;
@@ -27,12 +36,6 @@ public class ThreadSockets extends Thread {
                 mensagem = entrada.readUTF();
             }
             System.out.println("Recebe do cliente: "+mensagem);
-/*
-            try {
-                in = socket.getInputStream();
-            } catch (IOException ex) {
-                System.out.println("Não é possível obter o fluxo de entrada do soquete ");
-            }*/
 
             try {
                 System.out.println("*** server_1/"+mensagem);
@@ -43,18 +46,25 @@ public class ThreadSockets extends Thread {
 
             byte[] bytes = new byte[16*1024];
 
-            int count;
-            System.out.println("in.read(bytes) "+in.read(bytes));
+            int count = in.read(bytes);
+
+            System.out.println("count "+count);
+
             while ((count = in.read(bytes)) > 0) {
                 out.write(bytes, 0, count);
             }
+
+            System.out.println("Aqui");
 //}
-            /*// 3 - Fechar streams de entrada e saída de dados
-            out.close();
-            in.close();
+            // 3 - Fechar streams de entrada e saída de dados
+            //out.close();
+            //in.close();
+
             //4 - Fechar socket de comunicação
             socket.close();
-            //serverSocket.close();*/
+
+
+            //serverSocket.close();
 
             /*
             //1 - Definir stream de entrada de dados no servidor

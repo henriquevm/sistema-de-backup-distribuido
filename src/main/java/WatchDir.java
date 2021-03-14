@@ -95,9 +95,9 @@ public class WatchDir {
         this.recursive = recursive;
 
         if (recursive) {
-            System.out.format("Scanning %s ...\n", dir);
+            System.out.format("Observando diretorio %s ...\n", dir);
             registerAll(dir);
-            System.out.println("Done.");
+            // System.out.println("Done.");
         } else {
             register(dir);
         }
@@ -139,41 +139,49 @@ public class WatchDir {
                 Path name = ev.context();
                 Path child = dir.resolve(name);
 
-                System.out.println("name  "+name);
-                System.out.println("childq  "+child);
+                //System.out.println("name  "+name);
+               // System.out.println("child  "+child);
 
                 // print out event
                 System.out.format("Evento  %s: %s\n", event.kind().name(), child);
 
                 if (event.kind().name() == "ENTRY_CREATE"){
-                    System.out.println("ENTRY_CREATE");
-                    System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
 
-                    Socket socket = null;
-                    String host = "127.0.0.1";
+                    System.out.println("ENTRY_CREATE");
+                   // System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
+
                     //1 - Abrir conexão
-                    socket = new Socket(host, 54322);
+                    Socket socket = new Socket("127.0.0.1", 54321);
 
                     //2 - Definir stream de saída de dados do cliente
                     DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
-                    saida.writeUTF(String.valueOf(name)); //Envia  mensagem para o servidor
+                    saida.writeUTF(String.valueOf(name)); //Enviar  mensagem em minúsculo para o servidor
 
-                    System.out.println("child "+child);
-                    File file = new File(String.valueOf(child));
-                    // Get the size of the file
-                    long length = file.length();
-                    byte[] bytes = new byte[16 * 1024];
-                    InputStream in = new FileInputStream(file);
-                    OutputStream out = socket.getOutputStream();
+                    //3 - Definir stream de entrada de dados no cliente
+                    DataInputStream entrada = new DataInputStream(socket.getInputStream());
+                    String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
+                    System.out.println("O arquivo "+novaMensagem+" foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
 
-                    int count;
-                    while ((count = in.read(bytes)) > 0) {
-                        out.write(bytes, 0, count);
-                    }
-                    out.close();
-                    in.close();
+                    // envia o arquivo (transforma em byte array)
+                    File myFile = new File (String.valueOf(child));
+                    byte [] mybytearray  = new byte [(int)myFile.length()];
+                    FileInputStream fis = new FileInputStream(myFile);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    bis.read(mybytearray,0,mybytearray.length);
+                    OutputStream os = socket.getOutputStream();
+                    System.out.println("Enviando...");
+                    os.write(mybytearray,0,mybytearray.length);
+                    os.flush();
+
+                    os.close();
+                    bis.close();
+
+                    //4 - Fechar streams de entrada e saída de dados
+                    entrada.close();
+                    saida.close();
+
+                    //5 - Fechar o socket
                     socket.close();
-                    //System.out.format("Evento  %s: %s\n", event.kind().name(), child);
 
                     // if directory is created, and watching recursively, then
                     // register it and its sub-directories
