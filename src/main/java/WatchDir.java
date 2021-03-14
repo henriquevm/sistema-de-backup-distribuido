@@ -163,19 +163,20 @@ public class WatchDir {
                     String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
                     System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
 
-                    // envia o arquivo (transforma em byte array)
-                    File myFile = new File(String.valueOf(child));
-                    byte[] mybytearray = new byte[(int) myFile.length()];
-                    FileInputStream fis = new FileInputStream(myFile);
-                    BufferedInputStream bis = new BufferedInputStream(fis);
-                    bis.read(mybytearray, 0, mybytearray.length);
-                    OutputStream os = socket.getOutputStream();
-                    System.out.println("Enviando...");
-                    os.write(mybytearray, 0, mybytearray.length);
-                    os.flush();
-
-                    os.close();
-                    bis.close();
+                    if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY") {
+                        // envia o arquivo (transforma em byte array)
+                        File myFile = new File(String.valueOf(child));
+                        byte[] mybytearray = new byte[(int) myFile.length()];
+                        FileInputStream fis = new FileInputStream(myFile);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        bis.read(mybytearray, 0, mybytearray.length);
+                        OutputStream os = socket.getOutputStream();
+                        System.out.println("Enviando...");
+                        os.write(mybytearray, 0, mybytearray.length);
+                        os.flush();
+                        os.close();
+                        bis.close();
+                    }
 
                     //Fechar
                     entrada.close();

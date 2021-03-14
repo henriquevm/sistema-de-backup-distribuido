@@ -24,22 +24,25 @@ public class FileServer {
 
                 System.out.println("O arquivo " + mensagem + " foi recebido no cliente!");
 
-                String[] splitted= mensagem.split("/");
+                String[] splitted = mensagem.split("/");
 
-                String nomeArquivo= splitted[0]; //live
+                String nomeArquivo = splitted[0]; //live
 
                 String evento = splitted[1]; //coding
 
-                System.out.println("nomeArquivo "+nomeArquivo);
-                System.out.println("evento "+evento);
+                System.out.println("nomeArquivo " + nomeArquivo);
+                System.out.println("evento " + evento);
 
-                if(evento=="ENTRY_DELETE"){
-                    File file = new File(nomeArquivo);
+                //4 - Definir stream de saída de dados do servidor
+                DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
+                saida.writeUTF(nomeArquivo); //Enviar mensagem em maiúsculo para cliente
+
+                if (evento.equals("ENTRY_DELETE")) {
+                    System.out.println("ENTRY_DELETE entrou");
+                    File file = new File("server_1/" + nomeArquivo);
                     file.delete();
-                }else{
-                    //4 - Definir stream de saída de dados do servidor
-                    DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
-                    saida.writeUTF(nomeArquivo); //Enviar mensagem em maiúsculo para cliente
+                } else {
+
 
                     /*inicio programa de transferencia de arquivo*/
                     long start = System.currentTimeMillis();
