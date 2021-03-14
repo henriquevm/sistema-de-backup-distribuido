@@ -20,44 +20,58 @@ public class FileServer {
 
                 //3 - Definir stream de entrada de dados no servidor
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
-                String mensagem = entrada.readUTF();//receber mensagem em minúsculo do cliente
+                String mensagem = entrada.readUTF();//receber mensagem do cliente
 
                 System.out.println("O arquivo " + mensagem + " foi recebido no cliente!");
 
-                //4 - Definir stream de saída de dados do servidor
-                DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
-                saida.writeUTF(mensagem); //Enviar mensagem em maiúsculo para cliente
+                String[] splitted= mensagem.split("/");
 
-                /*inicio programa de transferencia de arquivo*/
-                long start = System.currentTimeMillis();
-                int bytesRead;
-                int current = 0;
+                String nomeArquivo= splitted[0]; //live
 
-                // recebendo o arquivo
-                byte[] mybytearray = new byte[filesize];
-                InputStream is = socket.getInputStream();
-                FileOutputStream fos = new FileOutputStream("server_1/" + mensagem);
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
-                bytesRead = is.read(mybytearray, 0, mybytearray.length);
-                current = bytesRead;
+                String evento = splitted[1]; //coding
 
-                do {
-                    bytesRead =
-                            is.read(mybytearray, current, (mybytearray.length - current));
-                    if (bytesRead >= 0) current += bytesRead;
-                } while (bytesRead > -1);
+                System.out.println("nomeArquivo "+nomeArquivo);
+                System.out.println("evento "+evento);
 
-                bos.write(mybytearray, 0, current);
-                long end = System.currentTimeMillis();
-                System.out.println(end - start);
+                if(evento=="ENTRY_DELETE"){
+                    File file = new File(nomeArquivo);
+                    file.delete();
+                }else{
+                    //4 - Definir stream de saída de dados do servidor
+                    DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
+                    saida.writeUTF(nomeArquivo); //Enviar mensagem em maiúsculo para cliente
 
-                bos.close();
-                /*fim programa de transferencia de arquivo*/
+                    /*inicio programa de transferencia de arquivo*/
+                    long start = System.currentTimeMillis();
+                    int bytesRead;
+                    int current = 0;
 
-                //5 - Fechar streams de entrada e saída de dados
+                    // recebendo o arquivo
+                    byte[] mybytearray = new byte[filesize];
+                    InputStream is = socket.getInputStream();
+                    FileOutputStream fos = new FileOutputStream("server_1/" + nomeArquivo);
+                    BufferedOutputStream bos = new BufferedOutputStream(fos);
+                    bytesRead = is.read(mybytearray, 0, mybytearray.length);
+                    current = bytesRead;
+
+                    do {
+                        bytesRead =
+                                is.read(mybytearray, current, (mybytearray.length - current));
+                        if (bytesRead >= 0) current += bytesRead;
+                    } while (bytesRead > -1);
+
+                    bos.write(mybytearray, 0, current);
+                    long end = System.currentTimeMillis();
+                    System.out.println(end - start);
+
+                    bos.close();
+                    /*fim programa de transferencia de arquivo*/
+
+                    //5 - Fechar streams de entrada e saída de dados
+
+                    saida.close();
+                }
                 entrada.close();
-                saida.close();
-
                 //6 - Fechar sockets de comunicação e conexão
                 socket.close();
 

@@ -30,11 +30,13 @@
  */
 
 import java.net.Socket;
-import java.nio.file. *;
-import static java.nio.file.StandardWatchEventKinds. *;
-import static java.nio.file.LinkOption. *;
-import java.nio.file.attribute. *;
-import java.io. *;
+import java.nio.file.*;
+
+import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.LinkOption.*;
+
+import java.nio.file.attribute.*;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -42,13 +44,13 @@ import java.util.*;
  */
 public class WatchDir {
     private final WatchService watcher;
-    private final Map<WatchKey,Path> keys;
+    private final Map<WatchKey, Path> keys;
     private final boolean recursive;
     private boolean trace = false;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
-        return (WatchEvent<T>)event;
+        return (WatchEvent<T>) event;
     }
 
     /**
@@ -78,8 +80,7 @@ public class WatchDir {
         Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-                    throws IOException
-            {
+                    throws IOException {
                 register(dir);
                 return FileVisitResult.CONTINUE;
             }
@@ -91,7 +92,7 @@ public class WatchDir {
      */
     WatchDir(Path dir, boolean recursive) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
-        this.keys = new HashMap<WatchKey,Path>();
+        this.keys = new HashMap<WatchKey, Path>();
         this.recursive = recursive;
 
         if (recursive) {
@@ -110,7 +111,7 @@ public class WatchDir {
      * Process all events for keys queued to the watcher
      */
     void processEvents() throws IOException {
-        for (;;) {
+        for (; ; ) {
 
             // wait for key to be signalled
             WatchKey key;
@@ -126,7 +127,7 @@ public class WatchDir {
                 continue;
             }
 
-            for (WatchEvent<?> event: key.pollEvents()) {
+            for (WatchEvent<?> event : key.pollEvents()) {
                 WatchEvent.Kind kind = event.kind();
 
                 // TBD - provide example of how OVERFLOW event is handled
@@ -140,61 +141,55 @@ public class WatchDir {
                 Path child = dir.resolve(name);
 
                 //System.out.println("name  "+name);
-               // System.out.println("child  "+child);
+                // System.out.println("child  "+child);
 
                 // print out event
                 System.out.format("Evento  %s: %s\n", event.kind().name(), child);
 
-                if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY"){
+                if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY" || event.kind().name() == "ENTRY_DELETE") {
 
                     System.out.println("ENTRY_CREATE");
-                   // System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
+                    // System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
 
                     //1 - Abrir conexão
                     Socket socket = new Socket("127.0.0.1", 54321);
 
                     //2 - Definir stream de saída de dados do cliente
-                    DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
-                    saida.writeUTF(String.valueOf(name)); //Enviar  mensagem em minúsculo para o servidor
+                    DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
+                    nomeArquivo.writeUTF(String.valueOf(name) + "/" + event.kind().name()); //Enviar  mensagem para o servidor
 
                     //3 - Definir stream de entrada de dados no cliente
                     DataInputStream entrada = new DataInputStream(socket.getInputStream());
                     String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
-                    System.out.println("O arquivo "+novaMensagem+" foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
+                    System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
 
                     // envia o arquivo (transforma em byte array)
-                    File myFile = new File (String.valueOf(child));
-                    byte [] mybytearray  = new byte [(int)myFile.length()];
+                    File myFile = new File(String.valueOf(child));
+                    byte[] mybytearray = new byte[(int) myFile.length()];
                     FileInputStream fis = new FileInputStream(myFile);
                     BufferedInputStream bis = new BufferedInputStream(fis);
-                    bis.read(mybytearray,0,mybytearray.length);
+                    bis.read(mybytearray, 0, mybytearray.length);
                     OutputStream os = socket.getOutputStream();
                     System.out.println("Enviando...");
-                    os.write(mybytearray,0,mybytearray.length);
+                    os.write(mybytearray, 0, mybytearray.length);
                     os.flush();
 
                     os.close();
                     bis.close();
 
-                    //4 - Fechar streams de entrada e saída de dados
+                    //Fechar
                     entrada.close();
-                    saida.close();
-
-                    //5 - Fechar o socket
                     socket.close();
-
-                    // if directory is created, and watching recursively, then
-                    // register it and its sub-directories
-                    if (recursive && (kind == ENTRY_CREATE)) {
-                        try {
-                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) registerAll(child);
-                        } catch (IOException x) {
-                            // ignore to keep sample readbale
-                        }
+                }
+                // if directory is created, and watching recursively, then
+                // register it and its sub-directories
+                if (recursive && (kind == ENTRY_CREATE)) {
+                    try {
+                        if (Files.isDirectory(child, NOFOLLOW_LINKS)) registerAll(child);
+                    } catch (IOException x) {
+                        // ignore to keep sample readbale
                     }
                 }
-
-
             }
 
             // reset key and remove from set if directory no longer accessible
@@ -237,7 +232,6 @@ public class WatchDir {
         System.out.println(teste2);
         String teste3 = teste1.replaceAll("\\\\", "");
         System.out.println(teste3);*/
-
 
 
         // situação 1: 1 Pasta apenass
