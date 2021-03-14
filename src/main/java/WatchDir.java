@@ -197,7 +197,6 @@ public class WatchDir {
                             System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
                             //System.out.println("child: " + child + "\n");
 
-
                             byte[] mybytearray = new byte[(int) myFile.length()];
                             System.out.println("myFile: " + myFile.toString());
 

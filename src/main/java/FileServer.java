@@ -43,16 +43,18 @@ public class FileServer {
                 DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
                 saida.writeUTF(nomeArquivo); //Enviar mensagem em maiúsculo para cliente
 
-                if (evento.equals("DIR_CREATE")) {
-                    System.out.println("É Diretorio " + evento);
-                    File file = new File("server_1/" + nomeArquivo);
-                    file.mkdir();
-                } else {
-                    if (evento.equals("ENTRY_DELETE")) {
-                        //System.out.println("ENTRY_DELETE entrou");
+                switch (evento) {
+                    case "DIR_CREATE":
+                        System.out.println("É Diretorio " + evento);
                         File file = new File("server_1/" + nomeArquivo);
-                        file.delete();
-                    } else {
+                        file.mkdir();
+                        break;
+                    case "ENTRY_DELETE":
+                        //System.out.println("ENTRY_DELETE entrou");
+                        File file_delete = new File("server_1/" + nomeArquivo);
+                        file_delete.delete();
+                        break;
+                    default:
                         long start = System.currentTimeMillis();
                         int bytesRead;
                         int current = 0;
@@ -83,7 +85,7 @@ public class FileServer {
                         saida.close();
 
                         System.out.println("Terminou a transferência\nIniciando transferência para os outros servidores");
-                    }
+
                 }
 
                 entrada.close();
