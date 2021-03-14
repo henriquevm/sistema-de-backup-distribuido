@@ -73,9 +73,9 @@ public class FileServer {
                             if (bytesRead >= 0) current += bytesRead;
                         } while (bytesRead > -1);
 
-                        bos.write(mybytearray, 0, current);
-                        long end = System.currentTimeMillis();
-                        System.out.println(end - start);
+                    bos.write(mybytearray, 0, current);
+                    long end = System.currentTimeMillis();
+                    //System.out.println(end - start);
 
                         bos.close();
                         /*fim programa de transferencia de arquivo*/
@@ -96,8 +96,8 @@ public class FileServer {
                 int portServer1 = 22222;
                 int portServer2 = 33333;
 
-                Thread t1 = new Thread(host, portServer1, nomeArquivo);
-                Thread t2 = new Thread(host, portServer2, nomeArquivo);
+                Thread t1 = new Thread(host, portServer1, nomeArquivo, evento);
+                Thread t2 = new Thread(host, portServer2, nomeArquivo, evento);
                 t1.start();
                 t2.start();
             }

@@ -5,35 +5,57 @@ public class Thread extends java.lang.Thread {
 
     private String host;
     private int port;
-    private String nomeArq;
+    private String nomeArquivo;
+    private String evento;
+    private Socket socket;
 
-
-    public Thread(String host, int port, String nomeArquivo){
+    public Thread(String host, int port, String nomeArquivo, String evento){
         this.host = host;
         this.port = port;
-        nomeArq = nomeArquivo;
+        this.nomeArquivo = nomeArquivo;
+        this.evento = evento;
+        this.socket = connectToBackupServer(this.host, this.port);
     }
 
     public void run() {
         System.out.println("Tread: " + this.getName());
+
+        switch(evento){
+            case "ENTRY_CREATE":
+            case "ENTRY_MODIFY": {
+                handleCreateAndModify();
+                break;
+            }
+            case "ENTRY_DELETE": {
+                handleDelete(this.nomeArquivo);
+                break;
+            }
+        }
+
+    }
+
+    public Socket connectToBackupServer(String host, int port){
         Socket socket = null;
         try {
-            socket = new Socket(host, port);
+            return new Socket(host, port);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
+    }
 
+    public void handleCreateAndModify(){
         // Enviando nome do arquivo para o servidor
         DataOutputStream dos = null;
         try {
-            dos = new DataOutputStream(socket.getOutputStream());
-            dos.writeUTF(nomeArq);
+            dos = new DataOutputStream(this.socket.getOutputStream());
+            dos.writeUTF(this.nomeArquivo);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Enviando arquivo para o servidor
-        File myFile = new File("server_1/" + nomeArq);
+        File myFile = new File("server_1/" + this.nomeArquivo);
 
         byte[] mybytearray = new byte[(int) myFile.length()];
 
@@ -59,7 +81,7 @@ public class Thread extends java.lang.Thread {
             e.printStackTrace();
         }
 
-        System.out.println("Arquivo " + nomeArq + " transferido para servidor de backup!\n");
+        System.out.println("Arquivo " + this.nomeArquivo + " transferido para servidor de backup " + this.getName().split("-")[1] + "\n");
 
         try {
             os.flush();
@@ -68,6 +90,10 @@ public class Thread extends java.lang.Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void handleDelete(String nomeArquivo){
+        File file = new File("server_1/" + nomeArquivo);
+        file.delete();
     }
 }
