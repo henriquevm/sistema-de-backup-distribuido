@@ -6,7 +6,7 @@ public class FileServer2 {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        try (ServerSocket serverSocket = new ServerSocket(54322)) {
+        try (ServerSocket serverSocket = new ServerSocket(22222)) {
             int filesize = 6022386;
 
             while (true) {
@@ -53,6 +53,8 @@ public class FileServer2 {
                 socket.close();
             }
 
+        }catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

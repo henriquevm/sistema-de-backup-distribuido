@@ -152,36 +152,72 @@ public class WatchDir {
                     // System.out.format("Evento dentro do if  %s: %s\n", event.kind().name(), child);
 
                     //1 - Abrir conexão
-                    Socket socket = new Socket("127.0.0.1", 54321);
+                    Socket socket = new Socket("127.0.0.1", 11111);
 
-                    //2 - Definir stream de saída de dados do cliente
-                    DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
-                    nomeArquivo.writeUTF(String.valueOf(name) + "/" + event.kind().name()); //Enviar  mensagem para o servidor
+                    if (event.kind().name() == "ENTRY_DELETE"){
+                        //2 - Definir stream de saída de dados do cliente
+                        DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
+                        nomeArquivo.writeUTF(String.valueOf(name) + "/" + event.kind().name()); //Enviar  mensagem para o servidor
 
-                    //3 - Definir stream de entrada de dados no cliente
-                    DataInputStream entrada = new DataInputStream(socket.getInputStream());
-                    String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
-                    System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
-                    System.out.println("child: " + child + "\n");
+                        //3 - Definir stream de entrada de dados no cliente
+                        DataInputStream entrada = new DataInputStream(socket.getInputStream());
+                        String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
+                        System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
+                        System.out.println("child: " + child + "\n");
+                        entrada.close();
+                    }
 
                     if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY") {
                         // envia o arquivo (transforma em byte array)
                         File myFile = new File(String.valueOf(child));
-                        byte[] mybytearray = new byte[(int) myFile.length()];
-                        System.out.println("myFile: " + myFile.toString());
-                        FileInputStream fis = new FileInputStream(myFile);
-                        BufferedInputStream bis = new BufferedInputStream(fis);
-                        bis.read(mybytearray, 0, mybytearray.length);
-                        OutputStream os = socket.getOutputStream();
-                        System.out.println("Enviado");
-                        os.write(mybytearray, 0, mybytearray.length);
-                        os.flush();
-                        os.close();
-                        bis.close();
+
+                        if (myFile.isDirectory()) {
+                            System.out.println("Directory");
+                            //2 - Definir stream de saída de dados do cliente
+                            DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
+                            nomeArquivo.writeUTF(String.valueOf(name) + "/DIR_CREATE"); //Enviar  mensagem para o servidor
+
+                            //3 - Definir stream de entrada de dados no cliente
+                            DataInputStream entrada = new DataInputStream(socket.getInputStream());
+                            String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
+                            System.out.println("O diretorio " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
+                            System.out.println("child: " + child + "\n");
+                            entrada.close();
+
+                        } else {
+                            System.out.println("is not Directory");
+
+                            //2 - Definir stream de saída de dados do cliente
+                            DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
+                            nomeArquivo.writeUTF(String.valueOf(name) + "/" + event.kind().name()); //Enviar  mensagem para o servidor
+
+                            //3 - Definir stream de entrada de dados no cliente
+                            DataInputStream entrada = new DataInputStream(socket.getInputStream());
+                            String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
+                            System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
+                            //System.out.println("child: " + child + "\n");
+
+
+                            byte[] mybytearray = new byte[(int) myFile.length()];
+                            System.out.println("myFile: " + myFile.toString());
+
+                            FileInputStream fis = new FileInputStream(myFile);
+                            BufferedInputStream bis = new BufferedInputStream(fis);
+                            bis.read(mybytearray, 0, mybytearray.length);
+                            OutputStream os = socket.getOutputStream();
+                            System.out.println("Enviado");
+                            os.write(mybytearray, 0, mybytearray.length);
+                            os.flush();
+                            os.close();
+                            bis.close();
+                            entrada.close();
+
+                        }
+
                     }
 
                     //Fechar
-                    entrada.close();
+
                     socket.close();
                 }
                 // if directory is created, and watching recursively, then

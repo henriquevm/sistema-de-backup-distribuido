@@ -10,7 +10,7 @@ public class FileServer {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         //1 - Definir o serverSocket (abrir porta de conexão)
-        try (ServerSocket serverSocket = new ServerSocket(54321)) {
+        try (ServerSocket serverSocket = new ServerSocket(11111)) {
             int filesize = 6022386;
 
             while (true) {
@@ -28,7 +28,7 @@ public class FileServer {
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
                 String mensagem = entrada.readUTF(); //receber mensagem do cliente
 
-                System.out.println("O arquivo " + mensagem + " foi recebido no cliente!\n");
+                System.out.println("O arquivo " + mensagem + " foi recebido do cliente!\n");
 
                 String[] splitted = mensagem.split("/");
 
@@ -36,58 +36,63 @@ public class FileServer {
 
                 String evento = splitted[1]; //coding
 
-                /*
                 System.out.println("nomeArquivo " + nomeArquivo);
                 System.out.println("evento " + evento);
-                */
 
                 //4 - Definir stream de saída de dados do servidor
                 DataOutputStream saida = new DataOutputStream(socket.getOutputStream());
                 saida.writeUTF(nomeArquivo); //Enviar mensagem em maiúsculo para cliente
 
-                if (evento.equals("ENTRY_DELETE")) {
-                    //System.out.println("ENTRY_DELETE entrou");
+                if (evento.equals("DIR_CREATE")) {
+                    System.out.println("É Diretorio " + evento);
                     File file = new File("server_1/" + nomeArquivo);
-                    file.delete();
+                    file.mkdir();
                 } else {
-                    long start = System.currentTimeMillis();
-                    int bytesRead;
-                    int current = 0;
+                    if (evento.equals("ENTRY_DELETE")) {
+                        //System.out.println("ENTRY_DELETE entrou");
+                        File file = new File("server_1/" + nomeArquivo);
+                        file.delete();
+                    } else {
+                        long start = System.currentTimeMillis();
+                        int bytesRead;
+                        int current = 0;
 
-                    // recebendo o arquivo
-                    byte[] mybytearray = new byte[filesize];
-                    InputStream is = socket.getInputStream();
-                    FileOutputStream fos = new FileOutputStream("server_1/" + nomeArquivo);
-                    BufferedOutputStream bos = new BufferedOutputStream(fos);
-                    bytesRead = is.read(mybytearray, 0, mybytearray.length);
-                    current = bytesRead;
+                        // recebendo o arquivo
+                        byte[] mybytearray = new byte[filesize];
+                        InputStream is = socket.getInputStream();
+                        FileOutputStream fos = new FileOutputStream("server_1/" + nomeArquivo);
+                        BufferedOutputStream bos = new BufferedOutputStream(fos);
+                        bytesRead = is.read(mybytearray, 0, mybytearray.length);
+                        current = bytesRead;
 
-                    do {
-                        bytesRead =
-                                is.read(mybytearray, current, (mybytearray.length - current));
-                        if (bytesRead >= 0) current += bytesRead;
-                    } while (bytesRead > -1);
+                        do {
+                            bytesRead =
+                                    is.read(mybytearray, current, (mybytearray.length - current));
+                            if (bytesRead >= 0) current += bytesRead;
+                        } while (bytesRead > -1);
 
-                    bos.write(mybytearray, 0, current);
-                    long end = System.currentTimeMillis();
-                    System.out.println(end - start);
+                        bos.write(mybytearray, 0, current);
+                        long end = System.currentTimeMillis();
+                        System.out.println(end - start);
 
-                    bos.close();
-                    /*fim programa de transferencia de arquivo*/
+                        bos.close();
+                        /*fim programa de transferencia de arquivo*/
 
-                    //5 - Fechar streams de entrada e saída de dados
+                        //5 - Fechar streams de entrada e saída de dados
 
-                    saida.close();
+                        saida.close();
 
-                    System.out.println("Terminou a transferência\nIniciando transferência para os outros servidores");
+                        System.out.println("Terminou a transferência\nIniciando transferência para os outros servidores");
+                    }
                 }
+
                 entrada.close();
                 //6 - Fechar sockets de comunicação e conexão
                 socket.close();
 
                 String host = "127.0.0.1";
-                int portServer1 = 54322;
-                int portServer2 = 54323;
+                int portServer1 = 22222;
+                int portServer2 = 33333;
 
                 Thread t1 = new Thread(host, portServer1, nomeArquivo);
                 Thread t2 = new Thread(host, portServer2, nomeArquivo);

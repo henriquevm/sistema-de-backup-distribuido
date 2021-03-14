@@ -6,7 +6,7 @@ public class FileServer3 {
 
     public static void main(String[] args){
 
-        try (ServerSocket serverSocket = new ServerSocket(54323)) {
+        try (ServerSocket serverSocket = new ServerSocket(33333)) {
             int filesize = 6022386;
 
             while (true) {
@@ -46,7 +46,6 @@ public class FileServer3 {
                 long end = System.currentTimeMillis();
                 //System.out.println(end - start);
 
-                bos.close();
                 bos.close();
 
                 System.out.println("Transferência para o servidor 3 bem sucedida!\n");
