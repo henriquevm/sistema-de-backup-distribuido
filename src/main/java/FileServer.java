@@ -33,7 +33,6 @@ public class FileServer {
                 String[] splitted = mensagem.split("/");
 
                 String nomeArquivo = splitted[0]; //live
-
                 String evento = splitted[1]; //coding
 
                 System.out.println("nomeArquivo " + nomeArquivo);
@@ -46,8 +45,14 @@ public class FileServer {
                 switch (evento) {
                     case "DIR_CREATE":
                         System.out.println("É Diretorio " + evento);
-                        File file = new File("server_1/" + nomeArquivo);
-                        file.mkdir();
+                        File DIR_CREATE = new File("server_1/" + nomeArquivo);
+                        DIR_CREATE.mkdir();
+                        break;
+                    case "DIR_DELETE":
+                        System.out.println("É Diretorio " + evento);
+                        File DIR_DELETE = new File("server_1/" + nomeArquivo);
+                        if ((DIR_DELETE.exists()) && (DIR_DELETE.isDirectory()))
+                            DIR_DELETE.delete();
                         break;
                     case "ENTRY_DELETE":
                         //System.out.println("ENTRY_DELETE entrou");
