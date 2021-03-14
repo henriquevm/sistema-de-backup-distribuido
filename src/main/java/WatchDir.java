@@ -162,6 +162,7 @@ public class WatchDir {
                     DataInputStream entrada = new DataInputStream(socket.getInputStream());
                     String novaMensagem = entrada.readUTF();//Receber mensagem em maiúsculo do servidor
                     System.out.println("O arquivo " + novaMensagem + " foi recebido no servido!"); //Mostrar mensagem em maiúsculo no cliente
+                    System.out.println("child: " + child + "\n");
 
                     if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY") {
                         // envia o arquivo (transforma em byte array)
@@ -171,7 +172,7 @@ public class WatchDir {
                         BufferedInputStream bis = new BufferedInputStream(fis);
                         bis.read(mybytearray, 0, mybytearray.length);
                         OutputStream os = socket.getOutputStream();
-                        System.out.println("Enviando...");
+                        System.out.println("Enviado");
                         os.write(mybytearray, 0, mybytearray.length);
                         os.flush();
                         os.close();
