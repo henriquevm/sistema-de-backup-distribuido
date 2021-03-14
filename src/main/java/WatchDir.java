@@ -168,6 +168,7 @@ public class WatchDir {
                         // envia o arquivo (transforma em byte array)
                         File myFile = new File(String.valueOf(child));
                         byte[] mybytearray = new byte[(int) myFile.length()];
+                        System.out.println("myFile: " + myFile.toString());
                         FileInputStream fis = new FileInputStream(myFile);
                         BufferedInputStream bis = new BufferedInputStream(fis);
                         bis.read(mybytearray, 0, mybytearray.length);

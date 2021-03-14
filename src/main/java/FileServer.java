@@ -85,39 +85,17 @@ public class FileServer {
                 //6 - Fechar sockets de comunicação e conexão
                 socket.close();
 
-                connectOthersServes(nomeArquivo, evento);
+                String host = "127.0.0.1";
+                int portServer1 = 54322;
+                int portServer2 = 54323;
+
+                Thread t1 = new Thread(host, portServer1, nomeArquivo);
+                Thread t2 = new Thread(host, portServer2, nomeArquivo);
+                t1.start();
+                t2.start();
             }
 
         }
 
-    }
-
-    public static void connectOthersServes(String nomeArq, String evento) throws IOException {
-        //System.out.println("chegou no método");
-
-        Socket socket = new Socket("127.0.0.1", 54322);
-
-        // Enviando nome do arquivo para o servidor
-        DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-        dos.writeUTF(nomeArq);
-
-        // Enviando arquivo para o servidor
-        File myFile = new File("server_1/" + nomeArq);
-
-        byte[] mybytearray = new byte[(int) myFile.length()];
-
-        FileInputStream fis = new FileInputStream(myFile);
-        BufferedInputStream bis = new BufferedInputStream(fis);
-        bis.read(mybytearray, 0, mybytearray.length);
-
-        OutputStream os = socket.getOutputStream();
-
-        os.write(mybytearray, 0, mybytearray.length);
-
-        System.out.println("Arquivo " + nomeArq + " enviado para o Servidor 2!\n");
-
-        os.flush();
-        os.close();
-        bis.close();
     }
 }
