@@ -245,48 +245,7 @@ public class WatchDir {
 
     public static void main(String[] args) throws IOException {
 
-        //String caminhoSchema = "cliente_obs\euslidio";
-/*
-        String caminho = "Office10\powerpnt.exe";
-        String caminhoAtual = caminho.replaceAll("[\\]", "\\"+"\\");
-
-        caminhoAtual = caminho.replaceAll("[\\]","/");
-
-
-
-
-        /* String teste1 = "a\\b\\c\\d\\e";
-
-        String[] splitted= teste1.split("'\\'");
-
-        String pasta= splitted[0];
-        String arquivo = splitted[1];
-
-        System.out.println("pasta "+pasta);
-        System.out.println("arquivo "+arquivo);
-
-        System.out.println(teste1);
-        String teste2 = teste1.replace("\\", "");
-        System.out.println(teste2);
-        String teste3 = teste1.replaceAll("\\\\", "");
-        System.out.println(teste3);*/
-
-
-        // situação 1: 1 Pasta apenass
-        /*String string = "cliente_obs \\ ffefefefe.txt";
-        String[] splitted= string.split("'\\'");
-
-        String pasta= splitted[0];
-        String arquivo = splitted[1];
-
-        System.out.println("pasta "+pasta);
-        System.out.println("arquivo "+arquivo);
-        /*String juncao = "server_1/"+arquivo;
-        System.out.println("juncao"+String.valueOf(Paths.get(juncao)));*/
-
-
         new WatchDir(Paths.get("cliente_obs"), true).processEvents();
-
 
     }
 }
