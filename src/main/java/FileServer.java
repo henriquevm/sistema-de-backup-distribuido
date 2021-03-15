@@ -36,8 +36,8 @@ public class FileServer {
 
                 String[] splitted = mensagem.split("/");
 
-                String nomeArquivo = splitted[1]; //live
-                String evento = splitted[0]; //coding
+                String nomeArquivo = splitted[1];
+                String evento = splitted[0];
 
                 System.out.println("evento " + evento);
                 System.out.println("nomeArquivo " + nomeArquivo);
@@ -49,12 +49,7 @@ public class FileServer {
 
                 switch (evento) {
                     case "DIR_CREATE":
-                        System.out.println("É Diretorio " + evento);
-                        System.out.println("É Diretorio " + evento);
-
-
-
-                        /*
+                        //System.out.println("É Diretorio " + evento);
                         File DIR_CREATE = new File("server_1/" + nomeArquivo);
                         DIR_CREATE.mkdir();*/
 
@@ -78,10 +73,7 @@ public class FileServer {
 
                         break;
                     case "DIR_DELETE":
-
-                        // NÃO ESTA ENTRANDO AQUI??
-
-                        System.out.println("************************************É Diretorio " + evento);
+                        //System.out.println("É Diretorio " + evento);
                         File DIR_DELETE = new File("server_1/" + nomeArquivo);
                         if ((DIR_DELETE.exists()) && (DIR_DELETE.isDirectory()))
                             DIR_DELETE.delete();
@@ -111,9 +103,9 @@ public class FileServer {
                             if (bytesRead >= 0) current += bytesRead;
                         } while (bytesRead > -1);
 
-                        bos.write(mybytearray, 0, current);
-                        long end = System.currentTimeMillis();
-                        //System.out.println(end - start);
+                    bos.write(mybytearray, 0, current);
+                    //long end = System.currentTimeMillis();
+                    //System.out.println(end - start);
 
                         bos.close();
                         /*fim programa de transferencia de arquivo*/

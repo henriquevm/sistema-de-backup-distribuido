@@ -157,14 +157,16 @@ public class WatchDir {
                     if (event.kind().name() == "ENTRY_DELETE"){
 
                         File myFile = new File(String.valueOf(child));
+
                         if (myFile.isDirectory()) {
 
                             // NÂO ESTA ENTRANDO AQUI ????
 
                             System.out.println("Deletando Diretorio");
+
                             //2 - Definir stream de saída de dados do cliente
                             DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
-                            nomeArquivo.writeUTF(String.valueOf(child) + "/DIR_DELETE"); //Enviar  mensagem para o servidor
+                            nomeArquivo.writeUTF( "DIR_DELETE/" + name.toString()); //Enviar  mensagem para o servidor
 
                             System.out.println("******name "+String.valueOf(name));
 
@@ -189,8 +191,6 @@ public class WatchDir {
                             System.out.println("child: " + child + "\n");
                             entrada.close();
                         }
-
-
                     }
 
                     if (event.kind().name() == "ENTRY_CREATE" || event.kind().name() == "ENTRY_MODIFY") {
@@ -201,7 +201,7 @@ public class WatchDir {
                             System.out.println("Directory");
                             //2 - Definir stream de saída de dados do cliente
                             DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
-                            nomeArquivo.writeUTF("DIR_CREATE/" + String.valueOf(name)); //Enviar  mensagem para o servidor
+                            nomeArquivo.writeUTF("DIR_CREATE/" + name.toString()); //Enviar  mensagem para o servidor
 
                             //3 - Definir stream de entrada de dados no cliente
                             DataInputStream entrada = new DataInputStream(socket.getInputStream());
@@ -215,7 +215,7 @@ public class WatchDir {
 
                             //2 - Definir stream de saída de dados do cliente
                             DataOutputStream nomeArquivo = new DataOutputStream(socket.getOutputStream());
-                            nomeArquivo.writeUTF(event.kind().name()+ "/" +String.valueOf(name) ); //Enviar  mensagem para o servidor
+                            nomeArquivo.writeUTF( event.kind().name() + "/" + name.toString()); //Enviar  mensagem para o servidor
 
                             //3 - Definir stream de entrada de dados no cliente
                             DataInputStream entrada = new DataInputStream(socket.getInputStream());
@@ -238,7 +238,6 @@ public class WatchDir {
                             entrada.close();
 
                         }
-
                     }
 
                     //Fechar

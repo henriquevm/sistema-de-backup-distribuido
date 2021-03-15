@@ -20,7 +20,7 @@ public class Thread extends java.lang.Thread {
     public void run() {
         System.out.println("Tread: " + this.getName());
 
-        switch(evento){
+        switch(this.evento){
             case "ENTRY_CREATE":
             case "ENTRY_MODIFY": {
                 handleCreateAndModify();
@@ -49,7 +49,7 @@ public class Thread extends java.lang.Thread {
         DataOutputStream dos = null;
         try {
             dos = new DataOutputStream(this.socket.getOutputStream());
-            dos.writeUTF(this.nomeArquivo);
+            dos.writeUTF(this.evento + "/" + this.nomeArquivo);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,7 +93,19 @@ public class Thread extends java.lang.Thread {
     }
 
     public void handleDelete(String nomeArquivo){
+        /*
         File file = new File("server_1/" + nomeArquivo);
         file.delete();
+         */
+
+        // Enviando mensagem para o servidor
+
+        DataOutputStream dos = null;
+        try {
+            dos = new DataOutputStream(this.socket.getOutputStream());
+            dos.writeUTF(this.evento + "/" + this.nomeArquivo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

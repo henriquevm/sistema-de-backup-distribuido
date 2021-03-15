@@ -4,58 +4,105 @@ import java.net.Socket;
 
 public class FileServer2 {
 
+    private static Socket socket;
+
     public static void main(String[] args) throws IOException, InterruptedException {
 
         try (ServerSocket serverSocket = new ServerSocket(22222)) {
             int filesize = 6022386;
 
             while (true) {
-                System.out.println("A porta 54322 foi aberta!\n");
-                System.out.println("Servidor pronto para nova conexão\n");
+                System.out.println("Porta 22222 aberta!\n");
+                System.out.println("Servidor pronto para estabelecer conexão\n");
 
-                Socket socket = serverSocket.accept();
+                socket = serverSocket.accept();
 
                 System.out.println("Servidor 1 aceito\nConexão estabelecida\n");
 
-                // Lendo nome do arquivo
+                // Lendo mensagem
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
-                String nomeArquivo = entrada.readUTF();
+                String mensagem = entrada.readUTF();
 
-                long start = System.currentTimeMillis();
-                int bytesRead;
-                int current = 0;
+                String[] splitted = mensagem.split("/");
 
-                // recebendo o arquivo
-                byte[] mybytearray = new byte[filesize];
+                String nomeArquivo = splitted[1];
+                String evento = splitted[0];
 
-                InputStream is = socket.getInputStream();
-
-                FileOutputStream fos = new FileOutputStream("server_2/" + nomeArquivo);
-
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-                bytesRead = is.read(mybytearray, 0, mybytearray.length);
-                current = bytesRead;
-
-                do {
-                    bytesRead = is.read(mybytearray, current, (mybytearray.length - current));
-                    if (bytesRead >= 0) current += bytesRead;
-                } while (bytesRead > -1);
-
-                bos.write(mybytearray, 0, current);
-                long end = System.currentTimeMillis();
-                //System.out.println(end - start);
-
-                bos.close();
-
-                System.out.println("Terminou a transferência para o servidor 2\n");
-
-                socket.close();
+                switch (evento){
+                    case "DIR_CREATE": {
+                        handleDirCreate(nomeArquivo);
+                        break;
+                    }
+                    case "DIR_DELETE": {
+                        handleDirDelete(nomeArquivo);
+                        break;
+                    }
+                    case "ENTRY_CREATE":
+                    case "ENTRY_MODIFY": {
+                        handleCreateAndModify(nomeArquivo);
+                        socket.close();
+                        break;
+                    }
+                    case "ENTRY_DELETE": {
+                        handleDelete(nomeArquivo);
+                        socket.close();
+                        break;
+                    }
+                }
             }
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+
+    public static void handleCreateAndModify(String nomeArquivo) throws IOException {
+        int filesize = 6022386;
+        int bytesRead;
+        int current = 0;
+
+        // recebendo o arquivo
+        byte[] mybytearray = new byte[filesize];
+
+        InputStream is = socket.getInputStream();
+
+        FileOutputStream fos = new FileOutputStream("server_2/" + nomeArquivo);
+
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+        bytesRead = is.read(mybytearray, 0, mybytearray.length);
+        current = bytesRead;
+
+        do {
+            bytesRead = is.read(mybytearray, current, (mybytearray.length - current));
+            if (bytesRead >= 0) current += bytesRead;
+        } while (bytesRead > -1);
+
+        bos.write(mybytearray, 0, current);
+        long end = System.currentTimeMillis();
+        //System.out.println(end - start);
+
+        bos.close();
+
+        //System.out.println("Transferência para o servidor 2 realizada\n");
+    }
+
+    public static void handleDelete(String nomeArquivo) {
+        File file_delete = new File("server_2/" + nomeArquivo);
+        file_delete.delete();
+    }
+
+    public static void handleDirCreate(String nomeArquivo) {
+        File DIR_CREATE = new File("server_2/" + nomeArquivo);
+        DIR_CREATE.mkdir();
+    }
+
+    public static void handleDirDelete(String nomeArquivo) {
+        File DIR_DELETE = new File("server_2/" + nomeArquivo);
+        if ((DIR_DELETE.exists()) && (DIR_DELETE.isDirectory())){
+            DIR_DELETE.delete();
+        }
+    }
+
 }
