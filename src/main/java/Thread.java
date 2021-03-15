@@ -23,11 +23,27 @@ public class Thread extends java.lang.Thread {
         switch(this.evento){
             case "ENTRY_CREATE":
             case "ENTRY_MODIFY": {
-                handleCreateAndModify();
+                handleCreateAndModify(this.nomeArquivo);
                 break;
             }
             case "ENTRY_DELETE": {
                 handleDelete(this.nomeArquivo);
+                break;
+            }
+            case "DIR_CREATE": {
+                try {
+                    handleDirCreate(nomeArquivo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+            case "DIR_DELETE": {
+                try {
+                    handleDirDelete(nomeArquivo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             }
         }
@@ -44,18 +60,18 @@ public class Thread extends java.lang.Thread {
         return null;
     }
 
-    public void handleCreateAndModify(){
+    public void handleCreateAndModify(String nomeArquivo){
         // Enviando nome do arquivo para o servidor
         DataOutputStream dos = null;
         try {
             dos = new DataOutputStream(this.socket.getOutputStream());
-            dos.writeUTF(this.evento + "/" + this.nomeArquivo);
+            dos.writeUTF(this.evento + "/" + nomeArquivo);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Enviando arquivo para o servidor
-        File myFile = new File("server_1/" + this.nomeArquivo);
+        File myFile = new File("server_1/" + nomeArquivo);
 
         byte[] mybytearray = new byte[(int) myFile.length()];
 
@@ -81,7 +97,7 @@ public class Thread extends java.lang.Thread {
             e.printStackTrace();
         }
 
-        System.out.println("Arquivo " + this.nomeArquivo + " transferido para servidor de backup " + this.getName().split("-")[1] + "\n");
+        System.out.println("Arquivo " + nomeArquivo + " transferido para servidor de backup " + this.getName().split("-")[1] + "\n");
 
         try {
             os.flush();
@@ -103,9 +119,19 @@ public class Thread extends java.lang.Thread {
         DataOutputStream dos = null;
         try {
             dos = new DataOutputStream(this.socket.getOutputStream());
-            dos.writeUTF(this.evento + "/" + this.nomeArquivo);
+            dos.writeUTF(this.evento + "/" + nomeArquivo);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void handleDirCreate(String nomeArquivo) throws IOException {
+        DataOutputStream mensagem = new DataOutputStream(socket.getOutputStream());
+        mensagem.writeUTF("DIR_CREATE/" + nomeArquivo); //Enviar  mensagem para o servidor
+    }
+
+    public void handleDirDelete(String nomeArquivo) throws IOException {
+        DataOutputStream mensagem = new DataOutputStream(socket.getOutputStream());
+        mensagem.writeUTF( "DIR_DELETE/" + nomeArquivo); //Enviar  mensagem para o servidor
     }
 }

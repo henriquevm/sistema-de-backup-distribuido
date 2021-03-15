@@ -1,6 +1,11 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 public class FileServer2 {
 
@@ -23,10 +28,15 @@ public class FileServer2 {
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
                 String mensagem = entrada.readUTF();
 
+                System.out.println("Chegou aqui\n");
+                System.out.println("mensagem: " + mensagem + "\n");
+
                 String[] splitted = mensagem.split("/");
 
                 String nomeArquivo = splitted[1];
                 String evento = splitted[0];
+
+                System.out.println("evento: " + evento);
 
                 switch (evento){
                     case "DIR_CREATE": {
@@ -93,15 +103,35 @@ public class FileServer2 {
         file_delete.delete();
     }
 
-    public static void handleDirCreate(String nomeArquivo) {
+    public static void handleDirCreate(String nomeArquivo) throws IOException {
         File DIR_CREATE = new File("server_2/" + nomeArquivo);
         DIR_CREATE.mkdir();
+
+        Path destinationDir = Paths.get("server_2/" + nomeArquivo);
+        Path sourceDir = Paths.get("cliente_obs/" + nomeArquivo);
+
+        copyFolder(sourceDir, destinationDir);
     }
 
     public static void handleDirDelete(String nomeArquivo) {
         File DIR_DELETE = new File("server_2/" + nomeArquivo);
-        if ((DIR_DELETE.exists()) && (DIR_DELETE.isDirectory())){
+
+        if ((DIR_DELETE.exists()) && (DIR_DELETE.isDirectory())) {
             DIR_DELETE.delete();
+        }
+    }
+
+    public static void copyFolder(Path src, Path dest) throws IOException {
+        try (Stream<Path> stream = Files.walk(src)) {
+            stream.forEach(source -> copy(source, dest.resolve(src.relativize(source))));
+        }
+    }
+
+    private static void copy(Path source, Path dest) {
+        try {
+            Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
